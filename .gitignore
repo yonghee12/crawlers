@@ -233,6 +233,7 @@ langframe/*
 _config.py
 header.py
 rootconfig.py
+config.py
 
 .DS_Store
 
