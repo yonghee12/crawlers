@@ -1,11 +1,18 @@
+import os
+import time
+import random
+
 from string import digits
 from urllib.parse import quote
 from urllib.request import Request, urlopen
-
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
+from rootconfig import ROOT_DIR
 from header import WATCHA_HEADERS as watcha_default_headers
+from header import WATCHA_EVAL_HEADERS, WATCHA_EVAL_COOKIES
+from crawlers.watcha.config import *
 
 digits = set(digits)
 
@@ -44,6 +51,13 @@ def get_watcha_reviews(url):
     result = res.get('result')
     if result:
         result = result.get('result')
+    return result
+
+
+def get_eval_result(url):
+    res = get_api(url, headers=WATCHA_EVAL_HEADERS, cookies=WATCHA_EVAL_COOKIES)
+    result = res.get('result')
+    result = result.get('result') if result else None
     return result
 
 
