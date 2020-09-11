@@ -235,3 +235,6 @@ header.py
 config.py
 
 .DS_Store
+
+results
+results/*
