@@ -1,0 +1,12 @@
+beautifulsoup4 == 4.6.0
+direct_redis
+gensim == 3.8.1
+nltk == 3.4.5
+pandas == 1.1.2
+progress_timer
+python_dateutil == 2.8.1
+redis == 3.4.1
+requests == 2.22.0
+selenium == 3.141.0
+selenium-wire == 2.1.1
+setuptools
