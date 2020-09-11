@@ -3,8 +3,9 @@ import random
 
 import pandas as pd
 
-from watcha.functions import *
+from crawlers.watcha.functions import *
 from header import get_headers_from_str, get_cookies_from_str
+from header import WATCHA_EVAL_HEADERS, WATCHA_EVAL_COOKIES
 
 url = "https://api-pedia.watcha.com/api/evaluations/movies?list_id=movies_19"
 s = """:method: GET
@@ -32,6 +33,3 @@ headers = get_headers_from_str(s)
 cookies = get_cookies_from_str(c)
 
 
-# result = get_api(url, headers=get_headers_from_str(s), cookies=get_cookies_from_str(c))
-response = requests.get(url, headers=headers, cookies=cookies)
-response.json()
