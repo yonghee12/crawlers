@@ -3,7 +3,7 @@ import random
 
 import pandas as pd
 
-from watcha.functions import *
+from crawlers.watcha.functions import *
 
 DEFAULT_WAIT = 5.1
 wait = DEFAULT_WAIT
@@ -19,7 +19,10 @@ print(f"n_max_commnets: {n_max}")
 
 # TODO: def, class로 리팩토링해서 stop flag 없애기
 stop = False
+total = 0
 for i in range(1, n_max // 20 + 2):
+    if i != 1 and i % 6 == 1:
+        time.sleep(6.1)
     url = f'https://api-pedia.watcha.com/api/contents/{content_id}/comments?filter=all&order={order}&page={i}&size=20'
     result = get_watcha_reviews(url)
     if not result:
@@ -28,13 +31,12 @@ for i in range(1, n_max // 20 + 2):
         else:
             attempt = 0
             while not result:
-                print(i, "NO RESULTS")
                 print(i, f'no results. waiting for {wait} sec.')
                 time.sleep(wait)
                 result = get_watcha_reviews(url)
                 attempt += 1
                 wait = DEFAULT_WAIT + attempt
-                if total > n_min and attempt >= 3:
+                if total > n_min and attempt >= 4:
                     stop = True
                     break
             wait = DEFAULT_WAIT
