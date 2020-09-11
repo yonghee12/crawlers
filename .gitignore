@@ -230,6 +230,8 @@ dmypy.json
 langframe
 langframe/*
 
-_config
-header
-config
+_config.py
+header.py
+config.py
+
+.DS_Store
