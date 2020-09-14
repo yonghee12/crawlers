@@ -6,14 +6,14 @@ class WatchaMetadataHandler:
     _URL_HEAD = 'https://api-pedia.watcha.com/api'
     _WAIT_COND = lambda self, i: i != 1 and i % 6 == 1
 
-    def __init__(self, max_attempt):
-        self._MAX_ATTEMPT = 3
+    def __init__(self, max_attempt=3):
+        self._MAX_ATTEMPT = max_attempt
         pass
 
-    def get(self, category, mx, verbose=1):
+    def get(self, category, max_page, verbose=1):
         df = pd.DataFrame()
         url_head = eval_links[category]
-        for i in range(1, mx + 1):
+        for i in range(1, max_page + 1):
             url = url_head + f"&page={i}&size=20"
             result = self._get_one_loop(url, i)
             if result is None:
@@ -29,7 +29,7 @@ class WatchaMetadataHandler:
     def _get_one_loop(self, api_url, i, attempt=1):
         wait = self._get_wait_time(i, attempt)
         if wait > 1:
-            print(i, f'Waiting for {wait} sec.')
+            print(f'Waiting for {wait} sec.')
             time.sleep(wait)
         result = get_eval_result(api_url)
         if result:
@@ -43,7 +43,7 @@ class WatchaMetadataHandler:
 
     def _get_wait_time(self, i, attempt):
         if attempt > 1:
-            return self._DEFAULT_WAIT_SEC + attempt
+            return self._DEFAULT_WAIT_SEC + attempt - 1
         elif self._WAIT_COND(i):
             return self._DEFAULT_WAIT_SEC
         elif i == 1:
