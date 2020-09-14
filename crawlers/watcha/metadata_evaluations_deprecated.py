@@ -1,7 +1,3 @@
-# TODO: lists:25의 의미, 몇개 가져올 것인지 파악
-# TODO: 보편적인 api handler 만들기
-
-
 from crawlers.watcha.functions import *
 
 category = '역대 100만 관객 돌파 영화'
@@ -11,7 +7,6 @@ DEFAULT_WAIT = 5.1
 wait = DEFAULT_WAIT
 
 df = None
-# TODO: def, class로 리팩토링해서 stop flag 없애기
 stop = False
 total = 0
 for i in range(1, 100):
