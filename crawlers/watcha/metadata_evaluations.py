@@ -2,18 +2,20 @@ from crawlers.watcha.functions import *
 
 
 class WatchaMetadataHandler:
-    _KEYS = list(eval_links.keys())
+    _KEYS = list(evaluation_ids.keys())
     _DEFAULT_WAIT_SEC = 6.1
-    _URL_HEAD = 'https://api-pedia.watcha.com/api'
+    _URL_HEAD = 'https://api-pedia.watcha.com/api/'
     _WAIT_COND = lambda self, i: i != 1 and i % 6 == 1
 
     def __init__(self, max_attempt=3):
         self._MAX_ATTEMPT = max_attempt
-        pass
+        self.api_head = api_headers['evaluation']
+        self.api_keys_set = set(evaluation_ids.keys())
 
     def get(self, category, max_page, verbose=1):
+        assert category in self.api_keys_set
+        url_head = self._URL_HEAD + self.api_head + evaluation_ids['category']
         df = pd.DataFrame()
-        url_head = eval_links[category]
         for i in range(1, max_page + 1):
             url = url_head + f"&page={i}&size=20"
             result = self._get_one_loop(url, i)
@@ -54,7 +56,7 @@ class WatchaMetadataHandler:
 
     def _get_transition_sec(self):
         # return 0.1 + random.random() / 2
-        return 0.1
+        return 0.01
 
     def _print_results(self, i, result):
         print(i, [r.get('title') for r in result])
@@ -68,9 +70,9 @@ class WatchaMetadataHandler:
         path = os.path.join(ROOT_DIR, filepath)
         df.to_csv(path)
 
-    @property
-    def keys(self):
-        return self._KEYS
+    @classmethod
+    def keys(cls):
+        return cls._KEYS
 
 
 if __name__ == '__main__':

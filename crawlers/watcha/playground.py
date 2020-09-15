@@ -6,30 +6,58 @@ import pandas as pd
 from crawlers.watcha.functions import *
 from header import get_headers_from_str, get_cookies_from_str
 from header import WATCHA_EVAL_HEADERS, WATCHA_EVAL_COOKIES
+from crawlers.watcha.functions import *
+from crawlers.watcha.metadata_evaluations import WatchaMetadataHandler
 
-url = "https://api-pedia.watcha.com/api/evaluations/movies?list_id=movies_19"
-s = """:method: GET
-:scheme: https
-:authority: api-pedia.watcha.com
-:path: /api/evaluations/movies?list_id=movies_19
-Accept: application/vnd.frograms+json;version=20
-Accept-Language: en-us
-Accept-Encoding: gzip, deflate, br
-Host: api-pedia.watcha.com
-Origin: https://pedia.watcha.com
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15
-Referer: https://pedia.watcha.com/ko-KR/review
-Connection: keep-alive
-Cookie: _ga=GA1.1.1344425241.1599812825; _ga_1PYHGTCRYW=GS1.1.1599812825.1.1.1599812870.0; _guinness_session=jTlq8Olj%2BLjwPQ8v3PhQhbSBkhLHwplSwBUl3lpkIZPFQpnacGdj3vgllogTLu6SR8QPjjhFIfr4Fpw5v77tmtYwkszwu1kuB%2BkaFRFTygTe6GqqTrqSG23q2Asn--TOGUWcmL3rx8CZGo--NKDOU9YACb65I8Ljwvrg0Q%3D%3D; _gid=GA1.2.1662639084.1599812825; Watcha-Web-Client-Language=ko; _s_guit=53dbb556ea7893a49f5c44740df41c6f8af19413a0fd0931d84b8d4896ef; _gat=1
-x-watcha-client-language: ko
-x-watcha-client-version: 2.0.0
-x-watcha-client: watcha-WebApp
-x-watcha-client-region: KR
-"""
+keys = WatchaMetadataHandler.keys()
+url = eval_links[keys[0]]
+df = pd.DataFrame()
+for i in range(0, 100):
+    if i != 0 and i % 6 == 0:
+        time.sleep(2)
+    url = f'https://api-pedia.watcha.com/api/evaluations/movies?list_id=movies_{i}'
+    res = get_api(url, headers=WATCHA_EVAL_HEADERS)
+    result = res.get("metadata")
+    if result and result.get('list'):
+        df = df.append(pd.json_normalize(result))
+        print(result)
+    else:
+        print(i, "not valid")
+    time.sleep(0.05)
 
-c = """_ga=GA1.1.1344425241.1599812825; _ga_1PYHGTCRYW=GS1.1.1599812825.1.1.1599812870.0; _guinness_session=jTlq8Olj%2BLjwPQ8v3PhQhbSBkhLHwplSwBUl3lpkIZPFQpnacGdj3vgllogTLu6SR8QPjjhFIfr4Fpw5v77tmtYwkszwu1kuB%2BkaFRFTygTe6GqqTrqSG23q2Asn--TOGUWcmL3rx8CZGo--NKDOU9YACb65I8Ljwvrg0Q%3D%3D; _gid=GA1.2.1662639084.1599812825; Watcha-Web-Client-Language=ko; _s_guit=53dbb556ea7893a49f5c44740df41c6f8af19413a0fd0931d84b8d4896ef; _gat=1"""
+directory = os.path.join(ROOT_DIR, 'results')
+if not os.path.exists(directory):
+    os.mkdir(directory)
+df.reset_index(inplace=True, drop=True)
+filepath = os.path.join("results", f"categories_{len(df)}.csv")
+path = os.path.join(ROOT_DIR, filepath)
+df.to_csv(path)
 
-headers = get_headers_from_str(s)
-cookies = get_cookies_from_str(c)
+print()
 
+s = """movies_18	국내 누적관객수 TOP 영화
+movies_19	역대 100만 관객 돌파 영화
+movies_22	전세계 흥행 TOP 영화
+movies_23	슈퍼 히어로
+movies_24	스포츠 영화
+movies_26	느와르
+movies_27	저예산 독립 영화
+movies_28	전문가 고평점 영화
+movies_35	왓챠 평균별점 TOP 영화
+movies_36	범죄
+movies_37	드라마
+movies_38	코미디
+movies_39	로맨스/멜로
+movies_40	스릴러
+movies_41	로맨틱코미디
+movies_42	전쟁
+movies_44	가족
+movies_45	판타지
+movies_46	액션
+movies_47	SF
+movies_48	애니메이션
+movies_49	다큐멘터리
+movies_50	공포
+movies_52	클래식"""
 
+{v: k for k, v in [ss.split('\t') for ss in s.split('\n')]}
