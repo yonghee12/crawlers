@@ -59,4 +59,4 @@ reviews = crawler.get_reviews(9791190030632, ['myreview_all', 'mypaper'])
 
 with open('temp.txt', 'w') as f:
     f.write('\n\n'.join(reviews))
-
+    f.close()
