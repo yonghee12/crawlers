@@ -1,9 +1,12 @@
 import re
 from bs4 import BeautifulSoup
-from urllib.request import Request, urlopen
 import requests
 
-from header import ALADIN_HEADERS
+ALADIN_HEADERS = {'Connection': 'keep-alive', 'Accept': '*/*', 'Sec-Fetch-Dest': 'empty',
+                  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36',
+                  'X-Requested-With': 'XMLHttpRequest', 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'cors',
+                  'Referer': 'https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=247905989&start=main',
+                  'Accept-Encoding': 'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.9'}
 
 
 def url_get(url, headers):
@@ -57,8 +60,4 @@ class AladinCrawl:
 
 
 crawler = AladinCrawl()
-reviews = crawler.get_reviews(9791190030632, ['myreview_all', 'mypaper'])
-
-with open('temp.txt', 'w') as f:
-    f.write('\n\n'.join(reviews))
-    f.close()
+reviews = crawler.get_reviews(9791157068166, ['myreview_all', 'mypaper'])
