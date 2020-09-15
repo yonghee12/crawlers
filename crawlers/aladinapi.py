@@ -6,10 +6,14 @@ import requests
 from header import ALADIN_HEADERS
 
 
-def get_aladin_review_links(url: str, headers: dict):
+def url_get(url, headers):
     response = requests.get(url, headers=headers)
     txt = response.text
-    bs = BeautifulSoup(txt, "lxml")
+    return BeautifulSoup(txt, "lxml")
+
+
+def get_aladin_review_links(url: str, headers: dict):
+    bs = url_get(url, headers)
     divs = bs.findAll('div', {'class': 'blog_list3'})
     link_head = "https://blog.aladin.co.kr"
     blog_links = []
@@ -19,9 +23,7 @@ def get_aladin_review_links(url: str, headers: dict):
 
 
 def get_aladin_blog_body(url, headers):
-    req = Request(url, headers=headers)
-    page = urlopen(req)
-    bs = BeautifulSoup(page.read(), "lxml")
+    bs = url_get(url, headers)
     article = bs.find('div', {'class': 'article'})
     parphs = article.findAll("p")
     texts = ""
