@@ -2,6 +2,7 @@ from crawlers.watcha.functions import *
 
 
 class WatchaMetadataHandler:
+    _KEYS = list(eval_links.keys())
     _DEFAULT_WAIT_SEC = 6.1
     _URL_HEAD = 'https://api-pedia.watcha.com/api'
     _WAIT_COND = lambda self, i: i != 1 and i % 6 == 1
@@ -66,6 +67,10 @@ class WatchaMetadataHandler:
         filepath = os.path.join("results", f'watcha_eval_{category}_len{len(df)}.csv')
         path = os.path.join(ROOT_DIR, filepath)
         df.to_csv(path)
+
+    @property
+    def keys(self):
+        return self._KEYS
 
 
 if __name__ == '__main__':
