@@ -16,7 +16,6 @@ class WatchaApiHandler:
         self._keys = list(evaluation_ids.keys())
         self.api_keys_set = set(self._keys)
 
-
     def get(self, category, max_page, verbose=1):
         assert category in self.api_keys_set
         url_head = self._URL_HEAD + self.api_head + evaluation_ids[category]
@@ -78,7 +77,6 @@ class WatchaApiHandler:
     @classmethod
     def keys(cls):
         return cls._KEYS
-
 
 
 class WatchaMetadataHandler(WatchaApiHandler):
