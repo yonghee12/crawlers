@@ -20,7 +20,8 @@ for url in urls:
     if soup.find('div', {'id': 'postViewArea'}):
         postview = soup.find('div', {'id': 'postViewArea'})
         ptags = postview.find_all('p')
-        text = '\n'.join([p for ptag in ptags if (p := ptag.get_text().strip()) and p not in stopwords])
+        # text = '\n'.join([p for ptag in ptags if (p := ptag.get_text().strip()) and p not in stopwords])
+        text = '\n'.join([ptag.get_text().strip() for ptag in ptags if ptag.get_text().strip() and ptag.get_text().strip() not in stopwords])
         print(text)
     else:
         print('here')
