@@ -2,6 +2,9 @@ import os
 import time
 import random
 
+from pathlib import Path
+PROJECT_ROOT = Path().parent.parent.absolute()
+
 from string import digits
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -54,7 +57,7 @@ def get_watcha_reviews(url):
     return result
 
 
-def get_eval_result(url):
+def get_api_result(url):
     res = get_api(url, headers=WATCHA_EVAL_HEADERS, cookies=WATCHA_EVAL_COOKIES)
     result = res.get('result')
     result = result.get('result') if result else None
