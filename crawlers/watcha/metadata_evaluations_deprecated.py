@@ -13,13 +13,13 @@ for i in range(1, 100):
     if i != 1 and i % 6 == 1:
         time.sleep(6.1)
     url = URL_HEAD + f"&page={i}&size=20"
-    result = get_eval_result(url)
+    result = get_api_result(url)
     if not result:
         attempt = 0
         while not result:
             print(i, f'no results. waiting for {wait} sec.')
             time.sleep(wait)
-            result = get_eval_result(url)
+            result = get_api_result(url)
             attempt += 1
             wait = DEFAULT_WAIT + attempt
             if attempt >= 4:
