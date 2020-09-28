@@ -17,7 +17,7 @@ class WatchaApiHandler:
     def get(self):
         raise NotImplementedError
 
-    def _get(self, url_head, max_page, verbose=1, n_max=1e9):
+    def _get(self, url_head, max_page, verbose=1, n_max=1e9, print_col=None):
         df = pd.DataFrame()
         for page in range(1, max_page + 1):
             url = url_head + f"&page={page}&size=20"
@@ -29,21 +29,24 @@ class WatchaApiHandler:
                 df = df.append(df_local)
                 time.sleep(self._get_transition_sec())
                 if verbose > 0:
-                    print(df_local.iloc[0])
-            self._total += 1
+                    if not print_col:
+                        print(df_local.iloc[0])
+                    else:
+                        print(set(list(df_local[print_col])))
+            self._total = len(df)
         self.reset_total()
         return df
 
     def _get_one_loop(self, api_url, i, attempt=1, n_max=1e9):
         wait = self._get_wait_time(i, attempt)
         if wait > 1:
-            print(f'Waiting for {wait} sec.')
+            print(f'Waiting for {wait} sec. Retrieved: {self._total}')
             time.sleep(wait)
         result = get_api_result(api_url)
         if result:
             return result
         else:
-            print("No Results")
+            print(f"No Results. | retrieved: {self._total}, n_max: {n_max}")
             if attempt >= self.max_attempt or self._total >= n_max:
                 print("Stop Attempt.")
                 return None
@@ -106,13 +109,14 @@ class WatchaCommentsHandler(WatchaApiHandler):
 
         self.api_keys_set = set(self._keys)
 
-    def get(self, title, content_id, order='popular', verbose=1):
+    def get(self, content_id, order='popular', verbose=1, print_col=None, title_to_save_df=None):
         url_head = f'https://api-pedia.watcha.com/api/contents/{content_id}/comments?filter=all&order={order}'
         n_min, n_max = get_n_comments(content_id)
         print(f"n_max_commnets: {n_max}")
 
-        df = self._get(url_head, n_max // 20 + 2, verbose, n_max)
-        # self._save_df(df, title)
+        df = self._get(url_head, n_max // 20 + 2, verbose, n_max, print_col=print_col)
+        if title_to_save_df:
+            self._save_df(df, title_to_save_df)
         return df
 
 
