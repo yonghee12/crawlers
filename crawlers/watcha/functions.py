@@ -72,7 +72,10 @@ def get_n_comments(content_id):
 
 
 def bs_n_comments(bs):
-    comment_header = [h for h in bs.find_all('header') if h.h2.text == '코멘트'][0]
+    comment_header = [h for h in bs.find_all('header') if h.h2.text == '코멘트']
+    if not comment_header:
+        return 0, 0,
+    comment_header = comment_header[0]
     text = comment_header.find('span').text
     n_comments = ''
     for l in text:

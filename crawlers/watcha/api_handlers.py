@@ -112,6 +112,8 @@ class WatchaCommentsHandler(WatchaApiHandler):
     def get(self, content_id, order='popular', verbose=1, print_col=None, title_to_save_df=None):
         url_head = f'https://api-pedia.watcha.com/api/contents/{content_id}/comments?filter=all&order={order}'
         n_min, n_max = get_n_comments(content_id)
+        if n_min == 0 and n_max == 0:
+            return None
         print(f"n_max_commnets: {n_max}")
 
         df = self._get(url_head, n_max // 20 + 2, verbose, n_max, print_col=print_col)

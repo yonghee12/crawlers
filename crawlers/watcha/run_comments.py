@@ -78,6 +78,10 @@ def update_comments_using_api(idx, content_id, titles):
     print_info(index, titles, content_id)
 
     df = api.get(content_id, verbose=1, print_col='code')
+    if df is None:
+        print(f"There is no comment in {content_id}.")
+        return None
+
     df_db = df[comments_columns]
     cur = conn.cursor()
 
