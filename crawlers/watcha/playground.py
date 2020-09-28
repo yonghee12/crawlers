@@ -7,14 +7,15 @@ from crawlers.watcha.functions import *
 from header import get_headers_from_str, get_cookies_from_str
 from header import WATCHA_EVAL_HEADERS, WATCHA_EVAL_COOKIES
 from crawlers.watcha.functions import *
-from crawlers.watcha.metadata_evaluations import WatchaMetadataHandler
+from crawlers.watcha.api_handlers import WatchaMetadataHandler
 
 keys = WatchaMetadataHandler.keys()
-url = eval_links[keys[0]]
+# url = eval_links[keys[0]]
 df = pd.DataFrame()
-for i in range(0, 100):
+for i in range(100, 200):
     if i != 0 and i % 6 == 0:
         time.sleep(2)
+    # i = 18
     url = f'https://api-pedia.watcha.com/api/evaluations/movies?list_id=movies_{i}'
     res = get_api(url, headers=WATCHA_EVAL_HEADERS)
     result = res.get("metadata")
