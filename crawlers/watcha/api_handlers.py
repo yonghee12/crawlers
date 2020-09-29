@@ -29,10 +29,12 @@ class WatchaApiHandler:
                 df = df.append(df_local)
                 time.sleep(self._get_transition_sec())
                 if verbose > 0:
-                    if not print_col:
+                    if print_col is None:
                         print(df_local.iloc[0])
+                    elif print_col == 'length':
+                        print(f"length: {len(df_local)} | url: {url}")
                     else:
-                        print(set(list(df_local[print_col])))
+                        print(list(df_local[print_col]))
             self._total = len(df)
         self.reset_total()
         return df
