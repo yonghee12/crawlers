@@ -39,6 +39,7 @@ def get_api(url, error=0, **kwargs):
             return dict()
         print(str(e), 'RELOADING REQUESTS MODULE')
         reload(requests)
+        time.sleep(5.1)
         return get_api(url, error + 1, **kwargs)
 
     return response.json()
