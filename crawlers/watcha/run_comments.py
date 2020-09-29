@@ -34,7 +34,7 @@ def truncate():
 def get_metadata_info():
     query = f"""
                 SELECT title, code FROM corpora.tb_watcha_metadata
-                WHERE is_comments_parsed=0
+                WHERE is_comments_parsed=0 and no_comments=0
                 ORDER BY id DESC;
     """.strip()
     print(query)
@@ -63,8 +63,7 @@ def get_comments_main_query(row):
     return query
 
 
-def mark_is_comment_parsed_true(row_idx, last_query, content_code):
-    print(row_idx, last_query)
+def mark_is_comment_parsed_true(content_code):
     cur = conn.cursor()
     q = f"""UPDATE tb_watcha_metadata SET is_comments_parsed = 1 WHERE code="{content_code}";"""
     cur.execute(query=q)
@@ -72,38 +71,48 @@ def mark_is_comment_parsed_true(row_idx, last_query, content_code):
     cur.close()
 
 
+def mark_no_comment(content_code):
+    cur = conn.cursor()
+    q = f"""UPDATE tb_watcha_metadata SET no_comments = 1 WHERE code="{content_code}";"""
+    cur.execute(query=q)
+    conn.commit()
+    cur.close()
+
+
 def update_comments_using_api(idx, content_id, titles):
-    error_flag = False
     index = START_FROM + idx
     print_info(index, titles, content_id)
 
     df = api.get(content_id, verbose=1, print_col='code')
     if df is None:
         print(f"There is no comment in {content_id}.")
-        return None
+        mark_no_comment(content_id)
+        return False
 
     df_db = df[comments_columns]
     cur = conn.cursor()
 
     for row_idx, row in df_db.iterrows():
-        error_flag = False
         query = get_comments_main_query(row)
         try:
             cur.execute(query=query)
             conn.commit()
+
         except Exception as e:
             print(str(e))
             print(f"ERROR on this query: {query}")
             print(f"{index}/{len(titles)}: {titles[index]}, {content_id}")
-            error_flag = True
+            return False
 
-    if not error_flag:
-        mark_is_comment_parsed_true(row_idx, query, content_id)
+    print(row_idx, query)
+    return True
 
 
 def update_comments_using_api_handler(titles, content_ids):
     for idx, content_id in enumerate(content_ids):
-        update_comments_using_api(idx, content_id, titles)
+        success = update_comments_using_api(idx, content_id, titles)
+        if success:
+            mark_is_comment_parsed_true(content_id)
         sleep(0.5)
 
 
@@ -118,6 +127,7 @@ def main():
     titles = list(metadata['title'])
     print(f"TOTAL CONTENT IDS: {len(content_ids)}")
     update_comments_using_api_handler(titles, content_ids)
+
 
 def debug():
     # api.get("mdRL4eL")  # 기생충
