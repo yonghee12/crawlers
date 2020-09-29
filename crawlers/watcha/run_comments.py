@@ -83,7 +83,7 @@ def update_comments_using_api(idx, content_id, titles):
     index = START_FROM + idx
     print_info(index, titles, content_id)
 
-    df = api.get(content_id, verbose=1, print_col='code')
+    df = api.get(content_id, verbose=1, print_col='length')
     if df is None:
         print(f"There is no comment in {content_id}.")
         mark_no_comment(content_id)
@@ -143,5 +143,5 @@ if __name__ == "__main__":
     api = WatchaCommentsHandler(mod=6, default_wait=5.1, max_attempt=MAX_ATTEMPT)
     stopwords = {'\"'}
 
-    debug()
-    # main()
+    # debug()
+    main()
