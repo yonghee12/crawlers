@@ -119,6 +119,10 @@ def main():
     print(f"TOTAL CONTENT IDS: {len(content_ids)}")
     update_comments_using_api_handler(titles, content_ids)
 
+def debug():
+    # api.get("mdRL4eL")  # 기생충
+    api.get("md76rgM")  # 스카이스크래퍼
+
 
 if __name__ == "__main__":
     TRUNCATE = False
@@ -129,4 +133,5 @@ if __name__ == "__main__":
     api = WatchaCommentsHandler(mod=6, default_wait=5.1, max_attempt=MAX_ATTEMPT)
     stopwords = {'\"'}
 
-    main()
+    debug()
+    # main()
