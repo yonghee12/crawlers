@@ -3,8 +3,10 @@ import time
 import random
 
 from pathlib import Path
+
 PROJECT_ROOT = Path().parent.parent.absolute()
 
+from importlib import reload
 from string import digits
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -20,17 +22,24 @@ from crawlers.watcha.config import *
 digits = set(digits)
 
 
-def get_api(url, **kargs):
+def get_api(url, error=0, **kwargs):
     options = {}
-    if kargs.get('headers'):
-        options.update({'headers': kargs['headers']})
-    elif kargs.get('cookies'):
-        options.update({'headers': kargs['headers']})
+    if kwargs.get('headers'):
+        options.update({'headers': kwargs['headers']})
+    elif kwargs.get('cookies'):
+        options.update({'headers': kwargs['headers']})
 
-    if options:
-        response = requests.get(url, **options)
-    else:
-        response = requests.get(url, headers=watcha_default_headers)
+    try:
+        if options:
+            response = requests.get(url, **options)
+        else:
+            response = requests.get(url, headers=watcha_default_headers)
+    except Exception as e:
+        if error > 2:
+            return dict()
+        print(str(e), 'RELOADING REQUESTS MODULE')
+        reload(requests)
+        return get_api(url, error + 1, **kwargs)
 
     return response.json()
 
@@ -66,9 +75,13 @@ def get_api_result(url):
 
 def get_n_comments(content_id):
     url = f'https://pedia.watcha.com/ko-KR/contents/{content_id}'
-    bs = get_html(url)
-    n_comments = bs_n_comments(bs)
-    return n_comments
+    try:
+        bs = get_html(url)
+        n_comments = bs_n_comments(bs)
+        return n_comments
+    except Exception as e:
+        print(str(e))
+        return 0, 0,
 
 
 def bs_n_comments(bs):
