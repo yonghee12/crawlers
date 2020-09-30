@@ -47,8 +47,8 @@ def print_info(index, titles, content_id):
 
 
 def get_comments_main_query(row):
-    text = row['text'].replace('\"', '').replace("\'", '')
-    username = row['user.name'].replace('\"', '').replace("\'", '')
+    text = row['text'].replace('\"', '').replace("\'", '').replace("\\", "")
+    username = row['user.name'].replace('\"', '').replace("\'", '').replace("\\", "")
     query = f"""
                 INSERT IGNORE INTO corpora.tb_watcha_comments(title, code, content_code, user_code, user_name, rating, text, 
                     watched_at, likes_count, replies_count, spoiler, improper, replyable, created_at) 
