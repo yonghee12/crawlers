@@ -41,8 +41,15 @@ def get_api(url, error=0, **kwargs):
         reload(requests)
         time.sleep(5.1)
         return get_api(url, error + 1, **kwargs)
-
-    return response.json()
+    else:
+        if response.status_code == 200:
+            try:
+                result = response.json()
+                return result
+            except:
+                return dict()
+        else:
+            return dict()
 
 
 def get_html(url):

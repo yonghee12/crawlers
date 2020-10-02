@@ -1,0 +1,17 @@
+REDIS_TABLES = {
+    "temp": 1,
+}
+
+REDIS_INFO = {
+    "temp": {
+        "host": 'localhost', "port": 8020, "password": "pw", 'db': REDIS_TABLES['temp']},
+}
+
+SLACK_AUTH_TOKEN = "xoxb-939769337249-999658780883-rKSFPjE96n5qzXaj9IOoYxXK"
+SLACK_CHANNELS = {
+    'slackbot_dev': 'C010D9ZGYH4',
+    'test': 'G011BQCP3QX'
+}
+
+NOTION_AUTH_TOKEN_V2 = "ac4e52791134633a79dd9168dfd698577ce7dc7ee3b09b1e7c1f08d3937fd905980660de03c327022fd8a62a70770eaf5ddce3d16132ebab3f56eba1d24f2f7988f0d268569d8e70170175e0de6d"
+SLACK_API_TOKEN = 'xoxb-7569711284-1370518631328-dWXH2YwtRaJnPWCqIHVY9Ym0'
