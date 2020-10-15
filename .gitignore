@@ -240,3 +240,5 @@ config.py
 results
 results/*
 *results*
+
+*scratch*
