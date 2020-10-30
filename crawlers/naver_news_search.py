@@ -10,6 +10,7 @@ import pickle
 from typing import *
 from importlib import reload
 from time import perf_counter as now
+from unicodedata import normalize
 
 from urllib.parse import quote, unquote
 import requests
@@ -28,13 +29,17 @@ class NaverSearchMetadata:
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0',
                'accept-language': 'ko;q=0.8,ko-KR;q=0.7'}
 
-    def __init__(self, db_info):
+    def __init__(self, db_info, sql_verbose=0):
         self.db_info = db_info
+        self.sql_verbose = sql_verbose
         self.conn = None
         self.connect()
 
     def connect(self):
         self.conn = pm.connect(**self.db_info)
+
+    def convert_naver_date_to_mysql_date(self, timestr):
+        return time.strftime('%Y-%m-%d', time.strptime(timestr, "%Y.%m.%d"))
 
     def get_links_and_insert(self, query, start_date, end_date, datestr, max_pages):
         page_idx = 0
@@ -53,29 +58,46 @@ class NaverSearchMetadata:
             # print(f"page_prev: {page_prev}, current page: {page_idx}")
             if page_prev == page_idx:
                 print(f"Query {query}, {datestr}는 {page_prev} 페이지가 마지막으로 판단되어 종료합니다.")
-            #     return None
+                return None
 
             atags = bs.findAll("a")
             news_links = [a.get('href') for a in atags if a.get_text() == "네이버뉴스" and a.get("href")]
+            if not news_links:
+                return None
+
+            data = {
+                'page': page_idx,
+                'start_time': self.convert_naver_date_to_mysql_date(start_date),
+                'end_date': self.convert_naver_date_to_mysql_date(end_date),
+                'query': query,
+                'links': news_links
+            }
 
             print([a.get_text() for a in bs.findAll("a", {"class": "news_tit"})])
 
-            # self.insert_db_handler(news_links, verbose=1)
+            self.insert_db_handler(data, verbose=self.sql_verbose)
 
-    def insert_db_handler(self, links, verbose):
+    def insert_db_handler(self, data, verbose):
         try:
-            self.insert_links(links, verbose)
+            self.insert_links(data, verbose)
         except Exception as e:
             print(str(e))
             self.connect()
-            self.insert_links(links, verbose)
+            self.insert_links(data, verbose)
 
-    def insert_links(self, links, verbose=0):
+    def insert_links(self, data, verbose=0):
         cur = self.conn.cursor()
-        for link in links:
+        search_query, typ, start_dt, end_dt, page = data['query'], "naver", data["start_time"], data['end_date'], data[
+            'page']
+        for link in data['links']:
+            # noinspection SqlNoDataSourceInspection,SqlInsertValues
             query = f"""
-                        INSERT IGNORE INTO corpora.covid_crawl_metadata(LINK, TYPE, PARSED_YN) 
-                        VALUES ("{link}", "naver", "0")
+            INSERT IGNORE INTO corpora.covid_crawl_metadata(
+            SEARCH_QUERY, TYPE, START_DATE, END_DATE, LINK, PAGE, PARSED_YN
+            ) 
+            VALUES (
+            "{search_query}", "{typ}", "{start_dt}", "{end_dt}", "{link}", "{page}", "0"
+            );
             """.strip()
             if verbose > 0:
                 print(query)
@@ -84,15 +106,16 @@ class NaverSearchMetadata:
         cur.close()
 
 
-crawler = NaverSearchMetadata(db_info=NIPA_DB_LOCAL)
+if __name__ == "__main__":
+    crawler = NaverSearchMetadata(db_info=NIPA_DB_LOCAL, sql_verbose=0)
 
-path = os.path.join(ROOT, "to_crawl.xlsx")
-queries = pd.read_excel(path, header=0, index_col=None)
+    path = os.path.join(ROOT, "to_crawl.xlsx")
+    queries = pd.read_excel(path, header=0, index_col=None)
 
-for idx, row in queries.iterrows():
-    query, start_date, end_date = row['query'], row['start_date'], row['end_date']
-    datestr = ''.join(start_date.split(".")) + 'to' + ''.join(end_date.split("."))
-    crawler.get_links_and_insert(query, start_date, end_date, datestr, max_pages=1000)
+    for idx, row in queries.iterrows():
+        query, start_date, end_date = row['query'], row['start_date'], row['end_date']
+        datestr = ''.join(start_date.split(".")) + 'to' + ''.join(end_date.split("."))
+        crawler.get_links_and_insert(query, start_date, end_date, datestr, max_pages=100)
 
-print('hello')
-print()
+    print('hello')
+    print()
