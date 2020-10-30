@@ -152,7 +152,7 @@ def main(metadata):
 if __name__ == '__main__':
     while True:
         metadata = get_metadata_info(conn, source='naver')
-        if not metadata.empty:
+        if metadata.empty:
             time.sleep(10)
             metadata = get_metadata_info(conn, source='naver')
             if metadata.empty:
