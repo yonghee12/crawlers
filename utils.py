@@ -7,16 +7,16 @@ def make_query_f_string(column_list):
     return ', '.join([f"\"{{row['{col}']}}\"" for col in column_list])
 
 
-def get_safe(url, headers=None, cookies=None, error=0, rtype='text'):
+def get_safe(url, headers=None, cookies=None, max_errors=2, rtype='text', error=0, ):
     try:
         response = requests.get(url, headers=headers, cookies=cookies)
     except Exception as e:
-        if error > 2:
+        if error > max_errors:
             return ''
         print(str(e), 'RELOADING REQUESTS MODULE')
         reload(requests)
         time.sleep(2)
-        return get_safe(url, headers, cookies, error + 1)
+        return get_safe(url, headers, cookies, max_errors, rtype, error + 1)
     else:
         if response.status_code == 200:
             if rtype == 'text':
