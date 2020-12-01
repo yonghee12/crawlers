@@ -1,5 +1,3 @@
-import os
-
 from utils import *
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
